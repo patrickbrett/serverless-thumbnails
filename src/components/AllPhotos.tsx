@@ -35,6 +35,7 @@ class AllPhotos extends Component<Props, State> {
           {fullSize.map((objectKey) => (
             <div key={objectKey}>
               <img
+                alt="Full size"
                 className="image-fullsize"
                 src={BUCKET_URL + "/" + objectKey}
               ></img>
@@ -45,6 +46,7 @@ class AllPhotos extends Component<Props, State> {
           {thumbnail.map((objectKey) => (
             <div key={objectKey}>
               <img
+                alt="Thumbnail"
                 className="image-thumbnail"
                 src={BUCKET_URL + "/" + objectKey}
               ></img>

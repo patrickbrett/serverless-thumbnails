@@ -8,6 +8,7 @@ function App() {
     <div className="App">
       <Upload />
       <AllPhotos />
+      <a href="https://pat.vc/thumbnails-repo">Github</a>
     </div>
   );
 }
