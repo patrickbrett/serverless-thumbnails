@@ -1,0 +1,1 @@
+exports.BUCKET_NAME = "sls-thumb-test";
