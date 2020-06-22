@@ -1,9 +1,7 @@
 import axios from "axios";
 import React, { Component } from "react";
-import "./style/Upload.css";
-
-const BACKEND_URL =
-  "https://v7ktx843pb.execute-api.us-east-1.amazonaws.com/dev";
+import { API_URL } from "../constants";
+import "../style/Upload.css";
 
 enum UploadState {
   NO_PHOTO = "No photo",
@@ -27,7 +25,7 @@ Object.keys(UploadState)
     const val = UploadState[uploadState as keyof typeof UploadState];
     uploadStateImage[
       val
-    ] = require(`./upload-status/${uploadState.toLowerCase()}.svg`);
+    ] = require(`../upload-status/${uploadState.toLowerCase()}.svg`);
   });
 
 const CANCELLED_BY_USER = "Cancelled by user";
@@ -80,7 +78,7 @@ class Upload extends Component<Props, State> {
     img.src = url;
   };
 
-  submitPhoto = (e: React.FormEvent<HTMLFormElement>) => {
+  submitPhoto = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const { file } = this.state.current;
@@ -89,104 +87,55 @@ class Upload extends Component<Props, State> {
       current: { ...prevState.current, uploadState: UploadState.PREPARING },
     }));
 
-    axios
-      .post(`${BACKEND_URL}/photos`)
-      .then((res) => {
-        console.log("GET photo upload url complete");
-        const { uploadUrl, photoId } = res.data;
+    try {
+      const uploadUrlRes = await axios.post(`${API_URL}/photos`);
 
-        this.setState((prevState) => ({
-          current: { ...prevState.current, photoId },
-        }));
+      const { uploadUrl } = uploadUrlRes.data;
 
-        console.log("upload Url: ", uploadUrl);
-
-        return axios
-          .put(uploadUrl, file, {
-            headers: { "Content-Type": "image/jpeg" },
-            cancelToken: new axios.CancelToken((c) => (this.cancel = c)),
-            onUploadProgress: (progressEvent) => {
-              const { loaded, total } = progressEvent;
-              const uploadProgress = Math.floor((loaded / total) * 100);
-              this.setState((prevState) => ({
-                current: {
-                  ...prevState.current,
-                  uploadState: UploadState.UPLOADING,
-                  uploadProgress,
-                },
-              }));
-            },
-          })
-          .then(() => photoId);
-      })
-      .then((photoId) => {
-        this.setState((prevState) => ({
-          current: {
-            ...prevState.current,
-            uploadState: UploadState.PROCESSING,
-          },
-        }));
-        const markPhotoUploadedUrl = `${BACKEND_URL}/mark-photo-uploaded/${photoId}`;
-        return axios.post(markPhotoUploadedUrl, null);
-      })
-      .then((res) => {
-        this.setState((prevState) => ({
-          current: { ...prevState.current, uploadState: UploadState.FINISHED },
-        }));
-        console.log(res);
-      })
-      .catch((err) => {
-        console.error(err, err.message);
-        if (err.message && err.message === CANCELLED_BY_USER) {
+      await axios.put(uploadUrl, file, {
+        headers: { "Content-Type": "image/jpeg" },
+        cancelToken: new axios.CancelToken((c) => (this.cancel = c)),
+        onUploadProgress: (progressEvent) => {
+          const { loaded, total } = progressEvent;
+          const uploadProgress = Math.floor((loaded / total) * 100);
           this.setState((prevState) => ({
             current: {
               ...prevState.current,
-              uploadState: UploadState.CANCELLED,
+              uploadState: UploadState.UPLOADING,
+              uploadProgress,
             },
           }));
-        } else {
-          this.setState((prevState) => ({
-            current: { ...prevState.current, uploadState: UploadState.ERROR },
-          }));
-        }
+        },
       });
+
+      this.setState((prevState) => ({
+        current: { ...prevState.current, uploadState: UploadState.FINISHED },
+      }));
+    } catch (err) {
+      console.error(err, err.message);
+      if (err.message && err.message === CANCELLED_BY_USER) {
+        this.setState((prevState) => ({
+          current: {
+            ...prevState.current,
+            uploadState: UploadState.CANCELLED,
+          },
+        }));
+      } else {
+        this.setState((prevState) => ({
+          current: { ...prevState.current, uploadState: UploadState.ERROR },
+        }));
+      }
+    }
   };
 
   cancelUpload = () => {
-    // TODO: database call to clean up upload by removing entry
     if (this.cancel) this.cancel(CANCELLED_BY_USER);
-  };
-
-  closeUploadForm = () => {
-    const { current } = { ...this.state };
-    const { uploadState } = current;
-
-    if (
-      [
-        UploadState.UPLOADING,
-        UploadState.PREPARING,
-        UploadState.PROCESSING,
-      ].includes(uploadState) &&
-      !window.confirm("Are you sure you want to quit this upload?")
-    )
-      return;
-
-    this.cancelUpload();
-
-    this.setState({
-      current: {
-        src: null,
-        file: undefined,
-        uploadProgress: 0,
-        uploadState: UploadState.NO_PHOTO,
-      },
-    });
   };
 
   render() {
     const upload = this.state;
 
-    const uploadFormDisplay = ({
+    const UploadForm = ({
       current: { uploadState, uploadProgress, src },
     }: State) => {
       let uploadStateDisplay;
@@ -208,9 +157,6 @@ class Upload extends Component<Props, State> {
               src={uploadStateImage[uploadState]}
             />
             <span className={`upload-state-text`}>{uploadState}</span>
-            {uploadState === UploadState.FINISHED && (
-              <div>Click to view (TODO)</div>
-            )}
           </div>
         );
       }
@@ -218,16 +164,16 @@ class Upload extends Component<Props, State> {
       // @ts-ignore
       const uploadButton = {
         [UploadState.READY]: <input type="submit" value="Upload!" />,
-        [UploadState.UPLOADING]: <button onClick={this.cancelUpload}>Cancel</button>,
+        [UploadState.UPLOADING]: (
+          <button onClick={this.cancelUpload}>Cancel</button>
+        ),
         [UploadState.ERROR]: <input type="submit" value="Try again" />,
-        [UploadState.CANCELLED]: <input type="submit" value="Try again" />
-      }[uploadState]
+        [UploadState.CANCELLED]: <input type="submit" value="Try again" />,
+      }[uploadState];
 
       return (
         <div className={`upload-form-container`}>
           <form
-            ref="uploadForm"
-            id="uploadForm"
             method="post"
             encType="multipart/form-data"
             onSubmit={this.submitPhoto}
@@ -256,7 +202,7 @@ class Upload extends Component<Props, State> {
       <div id={`upload`}>
         <div id={`container-main`} className={`container-uploads`}>
           <h1>Upload photo</h1>
-          {uploadFormDisplay(upload)}
+          <UploadForm {...upload} />
         </div>
       </div>
     );

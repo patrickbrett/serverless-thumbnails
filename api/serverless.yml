@@ -31,13 +31,14 @@ functions:
           path: /photos
           method: get
           cors: true
-  # resize-photo:
-  #   handler: functions/resize-photo.handler
-  #   events:
-  #     - s3:
-  #         bucket: ${self:custom.bucket}
-  #         event: s3:ObjectCreated:Put
-  #         rules:
-  #           - prefix: full-size/
-  #           - suffix: .jpg
-  #         existing: true
+  resize-photo:
+    handler: functions/resize-photo.handler
+    timeout: 30
+    events:
+      - s3:
+          bucket: ${self:custom.bucket}
+          event: s3:ObjectCreated:Put
+          rules:
+            - prefix: full-size/
+            - suffix: .jpg
+          existing: true

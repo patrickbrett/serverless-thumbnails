@@ -1,0 +1,19 @@
+.image-fullsize {
+    width: 400px;
+    height: auto;
+}
+
+.container {
+    background: #fff;
+    margin: 20px;
+    padding: 20px;
+    font-size: 18px;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 10vh;
+    width: 1600px;
+}
