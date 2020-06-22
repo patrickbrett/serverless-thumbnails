@@ -1,0 +1,71 @@
+#upload {
+    width: 80vw;
+}
+
+#imagePreview {
+    width: 400px;
+    height: auto;
+}
+
+#progressbar {
+    background-color: black;
+    border-radius: 13px;
+    padding: 3px;
+}
+
+#progressbar>div {
+    background-color: orange;
+    height: 20px;
+    border-radius: 10px;
+    transition: width 0.1s;
+}
+
+.upload-form-container {
+    background: #fff;
+    margin: 20px;
+    padding: 20px;
+    font-size: 18px;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
+    width: 100%;
+    position: relative;
+}
+
+.upload-state {
+    width: 30px;
+    height: auto;
+}
+
+.upload-form-container div {
+    margin: 10px 0;
+}
+
+strong {
+    font-weight: 600;
+}
+
+.container-uploads {
+    width: 80vw;
+    margin: 0 auto;
+}
+
+button {
+    padding: 10px;
+    border: 3px solid #ddd;
+    background: #ddd;
+}
+
+.form-close {
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    transition: 0.3s all;
+    padding: 10px;
+}
+
+.form-close:hover {
+    transform: rotate(-90deg) scale(1.1);
+    opacity: 0.8;
+}

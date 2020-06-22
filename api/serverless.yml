@@ -1,0 +1,60 @@
+service: serverless-thumbnail
+plugins:
+  - serverless-dotenv-plugin
+
+frameworkVersion: ">=1.47.0 <2.0.0"
+
+custom:
+  bucket: sls-thumb-test
+provider:
+  name: aws
+  runtime: nodejs10.x
+  environment:
+    PGUSER: ${env:PGUSER}
+    PGHOST: ${env:PGHOST}
+    PGPASSWORD: ${env:PGPASSWORD}
+    PGDATABASE: ${env:PGDATABASE}
+    PGPORT: ${env:PGPORT}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:* # TODO: narrow permissions - PutObject alone is somehow not enough to sign upload URLs
+        - s3:PutObject
+        - s3:GetObject
+      Resource: "arn:aws:s3:::${self:custom.bucket}/*"
+
+functions:
+  post-photos:
+    handler: functions/post-photos.handler
+    events:
+      - http:
+          path: /photos
+          method: post
+          cors: true
+    timeout: 15
+  mark-photo-uploaded:
+    handler: functions/mark-photo-uploaded.handler
+    events:
+      - http:
+          path: /mark-photo-uploaded/{photoId}
+          method: post
+          cors: true
+  get-photos:
+    handler: functions/get-photos.handler
+    events:
+      - http:
+          path: /photos
+          method: get
+          cors: true
+  resize-photo:
+    handler: functions/resize-photo.handler
+    runtime: nodejs8.10
+    timeout: 30
+    events:
+      - s3:
+          bucket: ${self:custom.bucket}
+          event: s3:ObjectCreated:Put
+          rules:
+            - prefix: full-size/
+            - suffix: .jpg
+          existing: true
