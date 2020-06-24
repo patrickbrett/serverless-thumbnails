@@ -9,8 +9,8 @@ function App() {
     <div className="App">
       <CssBaseline />
       <Container className="main-title-container">
-        <Typography className="main-title" variant="h2">Serverless Thumbnails Generator 🎆</Typography>
-        <p>quick access: <a style={{ color: "#000" }} href="https://pat.vc/thumbnails">pat.vc/thumbnails</a> 💪</p>
+        <Typography className="main-title" variant="h2">Serverless Thumbnails Generator <span role="img" aria-label="thumbnail">🎆</span></Typography>
+        <p>quick access: <a style={{ color: "#000" }} href="https://pat.vc/thumbnails">pat.vc/thumbnails</a> <span role="img" aria-label="strong">💪</span></p>
       </Container>
       <Container>
       <Upload />
