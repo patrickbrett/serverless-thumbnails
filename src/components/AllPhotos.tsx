@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { API_URL, BUCKET_URL, POLL_INTERVAL } from "../constants";
 import "../style/Photos.css";
+import { Paper } from "@material-ui/core";
 
 interface Props {}
 
@@ -31,7 +32,7 @@ class AllPhotos extends Component<Props, State> {
     const { fullSize, thumbnail } = this.state;
     return (
       <>
-        <div className="container">
+        <Paper className="container">
           {fullSize.map((objectKey) => (
             <div key={objectKey}>
               <img
@@ -41,8 +42,8 @@ class AllPhotos extends Component<Props, State> {
               ></img>
             </div>
           ))}
-        </div>
-        <div className="container">
+        </Paper>
+        <Paper className="container">
           {thumbnail.map((objectKey) => (
             <div key={objectKey}>
               <img
@@ -52,7 +53,7 @@ class AllPhotos extends Component<Props, State> {
               ></img>
             </div>
           ))}
-        </div>
+        </Paper>
       </>
     );
   }

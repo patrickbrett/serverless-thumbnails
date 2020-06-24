@@ -21,13 +21,8 @@
 }
 
 .upload-form-container {
-    background: #fff;
-    margin: 20px;
-    padding: 20px;
-    font-size: 18px;
-    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
-    width: 100%;
-    position: relative;
+    padding: 32px;
+    margin-bottom: 16px;
 }
 
 .upload-state {
@@ -41,11 +36,6 @@
 
 strong {
     font-weight: 600;
-}
-
-.container-uploads {
-    width: 80vw;
-    margin: 0 auto;
 }
 
 button {

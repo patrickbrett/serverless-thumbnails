@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { Component } from "react";
 import { API_URL } from "../constants";
 import "../style/Upload.css";
+import { Paper } from "@material-ui/core";
 
 enum UploadState {
   NO_PHOTO = "No photo",
@@ -172,7 +173,7 @@ class Upload extends Component<Props, State> {
       }[uploadState];
 
       return (
-        <div className={`upload-form-container`}>
+        <Paper className={`upload-form-container`}>
           <form
             method="post"
             encType="multipart/form-data"
@@ -194,7 +195,7 @@ class Upload extends Component<Props, State> {
             <div>{uploadButton}</div>
             {uploadStateDisplay}
           </form>
-        </div>
+        </Paper>
       );
     };
 
